@@ -1,4 +1,5 @@
 (()=>{
+    
     let set=(f,m)=>{
         let link = document.createElement('link');
         link.rel="stylesheet";
