@@ -1,5 +1,5 @@
 const fs = require("fs");
-const mediaPatern = /\((.+?)\)/g;
+const mediaPatern = /\((.+?)\)/g; // патерн поиска занчений (любой текст в этих скобках)
 
 
 // const readline = require('readline');
@@ -15,31 +15,56 @@ const mediaPatern = /\((.+?)\)/g;
 //   rl.close();
 // });
 
+let issets = []; // хранилище пройденных запросов
+let pushFile=(name,data)=>{
+    console.log('Обработка запроса: ',name);
+    name = name.replace('(','').replace(')','').replace(':','-');
+    if(issets.includes(name)){
+        console.log(`Найден дубль запроса: `,name);
+        fs.appendFile(`${name}.css`,data, function(error){
+            if(error) throw error; // если возникла ошибка  
+            console.log(`Асинхронная дозапись дубля в файл ${name}.css завершена.`);
+        });
+    }else{
+        issets.push(name); // сбор пройденых запросов
+        fs.writeFile(`${name}.css`,data, function(error){
+            if(error) throw error; // если возникла ошибка
+            console.log(`Асинхронная запись файла ${name}.css завершена.`);
+        });
+    }
+}
+
+let cleanMediaCss=(css,media)=>{ // удаление медиазапроса и скобок
+    css = css.replace('{','').replace(media,'');
+    css = css.split('').reverse().join('').replace('}','').split('').reverse().join('');
+    return css;
+}
+
+
 fs.readFile("test.css","utf8",(err,data)=>{
     console.log('Читаю файл');
     if(err) throw err;
-    // console.log(data);
-    let arrMedias = data.split('@media');
+    let arrMedias = data.split('@media'); // раздел файла по запросам
     for(let i=0;i<arrMedias.length;i++){
         let thisMedia = arrMedias[i].match(mediaPatern);
         if(thisMedia){
             if(thisMedia.length==1){
-                arrMedias[i] = arrMedias[i].replace('{','').replace(thisMedia,'');
-                arrMedias[i] = arrMedias[i].split('').reverse().join('').replace('}','').split('').reverse().join('');
-                if(thisMedia[0].match('max-width')&&!thisMedia[0].match('min-width')){
-                    let media = thisMedia[0].match(/\d{3,4}/);
-                    fs.writeFile(`-${media[0]}.css`,arrMedias[i], function(error){
-                        if(error) throw error; // если возникла ошибка
-                        console.log(`Асинхронная запись файла -${media[0]}.css завершена.`);
-                    });
-                }else if(!thisMedia[0].match('max-width')&&thisMedia[0].match('min-width')){
-                    let media = thisMedia[0].match(/\d{3,4}/);
-                    fs.writeFile(`${media[0]}.css`,arrMedias[i], function(error){
-                        if(error) throw error; // если возникла ошибка
-                        console.log(`Асинхронная запись файла ${media[0]}.css завершена.`);
-                    });
+                thisMedia = thisMedia[0];
+                if(thisMedia.match('max-width')){
+                    pushFile(thisMedia,cleanMediaCss(arrMedias[i],thisMedia));
+                }else if(thisMedia.match('min-width')){
+                    pushFile(thisMedia,cleanMediaCss(arrMedias[i],thisMedia));
+                }else if(thisMedia.match('min-height')){
+                    pushFile(thisMedia,cleanMediaCss(arrMedias[i],thisMedia));
+                }else if(thisMedia.match('max-height')){
+                    pushFile(thisMedia,cleanMediaCss(arrMedias[i],thisMedia));
                 }
-            }else{
+                
+                else{
+                    pushFile(`default`,'@media'+arrMedias[i]);
+                    console.log(thisMedia);
+                }
+            }else if(thisMedia.length == 2){
                 arrMedias[i] = arrMedias[i].replace('{','');
                 arrMedias[i] = arrMedias[i].replace(thisMedia[0],'').replace(thisMedia[1],'').replace('AND','').replace('and','').replace('And','');
                 arrMedias[i] = arrMedias[i].split('').reverse().join('').replace('}','').split('').reverse().join('');
@@ -49,28 +74,17 @@ fs.readFile("test.css","utf8",(err,data)=>{
                     if(start == 'min-width' && end == 'max-width'){
                         let mediaStart = start.input.match(/\d{3,4}/);
                         let mediaEnd = end.input.match(/\d{3,4}/);
-                        fs.writeFile(`${mediaStart[0]}-${mediaEnd[0]}.css`,arrMedias[i], function(error){
-                            if(error) throw error; // если возникла ошибка
-                            console.log(`Асинхронная запись файла ${mediaStart[0]}-${mediaEnd[0]}.css завершена.`);
-                        });
+                        pushFile(`${mediaStart[0]}-${mediaEnd[0]}`,arrMedias[i]);
                     }else if(start == 'max-width' && end == 'min-width'){
                         let mediaStart = start.input.match(/\d{3,4}/);
                         let mediaEnd = end.input.match(/\d{3,4}/);
-                        fs.writeFile(`${mediaEnd[0]}-${mediaStart[0]}.css`,arrMedias[i], function(error){
-                            if(error) throw error; // если возникла ошибка
-                            console.log(`Асинхронная запись файла ${mediaEnd[0]}-${mediaStart[0]}.css завершена.`);
-                        });
+                        pushFile(`${mediaEnd[0]}-${mediaStart[0]}`,arrMedias[i]);
                     }
                 }
-                console.log(start.input);
-                console.log(start,end);
             }
         }
         else{
-            fs.writeFile("def.css",arrMedias[i], function(error){
-                if(error) throw error; // если возникла ошибка
-                console.log("Асинхронная запись файла def.css завершена.");
-            });
+            pushFile(`default`,arrMedias[i]);
         }
     }
 })
