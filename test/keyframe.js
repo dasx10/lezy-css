@@ -2,6 +2,7 @@ const {pushFile} = require('./pushFile');
 const {readFile} = require("fs");
 const keyframePattern = /@keyframes+[^@]+}+([\s]|)+}/g; // патерн поиска всех frame выражений и его инструкций
 
+
 readFile("test.css","utf8",(err,data)=>{
     console.time();
     let arrMedias = data.match(keyframePattern);
