@@ -2,7 +2,8 @@ const fs = require("fs");
 let issets = [];
 module.exports.pushFile=(name,data)=>{
     console.log('Обработка запроса: ',name);
-    // name = name.replace(/\(/g,'').replace(/\)/g,'').replace(/\:/g,'-');
+    name = name
+    .replace(/(\(|\)|:| )/g,'');
     if(issets.includes(name)){
         console.log(`Найден дубль запроса: `,name);
         fs.appendFile(`${name}.css`,data, function(error){
