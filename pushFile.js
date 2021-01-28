@@ -5,7 +5,7 @@ module.exports.pushFile=(name, data, dirname = './')=>{
     name = name
     .replace(/(\(|\)|:| )/g,'');
     if(issets.includes(name)){
-        console.log(`Найден дубль запроса: `,name);
+        console.log(`Duplicate found: `,name);
         fs.appendFile(`${name}.css`,data, function(error){
             if(error) throw error; // если возникла ошибка  
             console.log(`Asynchronous recording of a take to a file ${name}.css complited.`);
