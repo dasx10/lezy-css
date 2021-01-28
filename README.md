@@ -15,6 +15,7 @@ lezyCss('style.css','./dist');
 ```
 
 params
-
+```
 first - input file
 second - output result
+```
