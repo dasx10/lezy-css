@@ -1,0 +1,33 @@
+{
+  "name": "lezy-css",
+  "version": "1.0.2",
+  "description": "Splitting media queries and lazy loading in parts from a viewport",
+  "main": "media.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "css",
+    "responsive",
+    "web",
+    "front-end",
+    "media",
+    "query",
+    "mq",
+    "optimisation",
+    "retina",
+    "mobile",
+    "desctop",
+    "split"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dasx10/lezy-css.git"
+  },
+  "author": "Yevhenii Kleshchev <dasx10@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dasx10/lezy-css/issues"
+  },
+  "homepage": "https://github.com/dasx10/lezy-css#readme"
+}
