@@ -1,6 +1,6 @@
 {
   "name": "lezy-css",
-  "version": "2.0.0",
+  "version": "2.1.2",
   "description": "Splitting media queries and lazy loading in parts from a viewport",
   "main": "media.js",
   "scripts": {
@@ -18,7 +18,10 @@
     "retina",
     "mobile",
     "desctop",
-    "split"
+    "split",
+    "lazy",
+    "load",
+    "lazy-load"
   ],
   "repository": {
     "type": "git",

@@ -24,6 +24,7 @@ splitMQ= async (filesName, dirname = './') => {
     let arrMedias = data.match(mediaPatern);
     // console.log(arrMedias);
     let all = data;
+    let nameArr = new Set()
     if(arrMedias){
         for(let i=0;i< arrMedias.length ;i++){
             let name = '';
@@ -31,6 +32,7 @@ splitMQ= async (filesName, dirname = './') => {
                 name = arrMedias[i]
                 .match(mediaQueryPatern)[0]
                 .replace('@media','')
+                console.log(`name`,name);
             }catch{
                 console.log(arrMedias[i]);
             }
@@ -45,11 +47,14 @@ splitMQ= async (filesName, dirname = './') => {
             ));
 
             all = all.replace(arrMedias[i],'');
-            arrStyle += `"${name.trim()}",`;
+            nameArr.add(`"${name.trim()}",`);
         }
     }
     arrRequest.push(pushFile('all', all, dirname));
-    arrStyle += '"all"];let a=()=>m.forEach((s,i)=>{if(matchMedia(m[i]).matches){let l=document.createElement("link");l.rel="stylesheet";l.media=s;l.href=`test/${s.replace(/(\\(|\\)|:| )/g,"")}.css`;m.splice(i,1);document.head.append(l);}});a();addEventListener("resize",a);})();'
+    nameArr.forEach((name)=>arrStyle+=name);
+
+    arrStyle += '"all"];let a=()=>m.forEach((s,i)=>{if(matchMedia(m[i]).matches){let l=document.createElement("link");l.rel="stylesheet";l.media=s;l.href=`'
+    arrStyle += dirname.replace('./','')+'/${s.replace(/(\\(|\\)|:| )/g,"")}.css`;m.splice(i,1);document.head.append(l);}});a();addEventListener("resize",a);})();'
     await Promise.all(arrRequest)
     console.timeEnd('Handling media queries');
     console.log('\n\n');
@@ -59,7 +64,7 @@ splitMQ= async (filesName, dirname = './') => {
     console.log('\n\n');
     console.log("\x1b[32m",`or embed code to your index.html file - after opening a tag`,"\x1b[34m",`<body>`);
     console.log("\x1b[33m");
-    console.log(`<script>${arrStyle}<script>`,"\x1b[0m");
+    console.log(`<script>${arrStyle}</script>`,"\x1b[0m");
     console.log('\n\n');
     return (arrStyle);
 }   
